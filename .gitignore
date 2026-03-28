@@ -1,0 +1,16 @@
+# Node.js
+node_modules/
+npm-debug.log
+.env
+.DS_Store
+
+# Google Cloud Credentials (CRITICAL)
+google-credentials.json
+backend/google-credentials.json
+temp_audio.wav
+backend/temp_audio.wav
+
+# Other
+venv/
+__pycache__/
+*.log

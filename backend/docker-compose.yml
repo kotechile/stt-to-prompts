@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  stt-backend:
+    build: .
+    image: jorge/stt-backend:latest
+    container_name: stt-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - GOOGLE_APPLICATION_CREDENTIALS=/usr/src/app/google-credentials.json
+    volumes:
+      # In Coolify, you should use their 'Secrets' feature to mount this file
+      - ./google-credentials.json:/usr/src/app/google-credentials.json
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

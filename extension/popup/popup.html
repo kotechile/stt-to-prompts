@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            width: 320px;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .header-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #4285f4, #34a853);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header-icon svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .header-text h1 {
+            font-size: 18px;
+            color: #1a73e8;
+            margin-bottom: 2px;
+        }
+
+        .header-text p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .status-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .status-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .status-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-badge.ready {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-badge.recording {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .shortcut-hint {
+            background: #e8f0fe;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 13px;
+            color: #1a73e8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .shortcut-keys {
+            background: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: 600;
+            border: 1px solid #dadce0;
+        }
+
+        .instructions {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .instructions h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .instruction-step {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .instruction-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            width: 20px;
+            height: 20px;
+            background: #1a73e8;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .settings-section {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .settings-section h3 {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .setting-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .setting-label {
+            font-size: 13px;
+            color: #555;
+        }
+
+        select {
+            padding: 6px 10px;
+            border: 1px solid #dadce0;
+            border-radius: 6px;
+            font-size: 13px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            min-width: 140px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #1a73e8;
+        }
+
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        .toggle input:checked + .toggle-slider {
+            background-color: #1a73e8;
+        }
+
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+        }
+
+        .footer a {
+            color: #1a73e8;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .mic-test {
+            background: linear-gradient(135deg, #1a73e8, #4285f4);
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .mic-test:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+        }
+
+        .mic-test:active {
+            transform: translateY(0);
+        }
+
+        .mic-test svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .test-area {
+            margin-top: 12px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #333;
+            min-height: 60px;
+            border: 1px dashed #dadce0;
+        }
+
+        .test-area:empty::before {
+            content: "Your speech will appear here...";
+            color: #999;
+            font-style: italic;
+        }
+
+        .test-area.recording {
+            border-color: #ea4335;
+            background: #fff5f5;
+        }
+
+        /* Dark mode */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #1a1a1a;
+                color: #fff;
+            }
+
+            .header-text h1 {
+                color: #5c9cf5;
+            }
+
+            .header-text p {
+                color: #aaa;
+            }
+
+            .status-card,
+            .instructions,
+            .settings-section {
+                background: #2d2d2d;
+            }
+
+            .status-label {
+                color: #fff;
+            }
+
+            .instruction-step {
+                color: #ccc;
+            }
+
+            .settings-section h3,
+            .instructions h3 {
+                color: #fff;
+            }
+
+            select {
+                background: #3d3d3d;
+                color: #fff;
+                border-color: #555;
+            }
+
+            .shortcut-hint {
+                background: #1a3a5c;
+                color: #5c9cf5;
+            }
+
+            .test-area {
+                background: #3d3d3d;
+                color: #fff;
+                border-color: #555;
+            }
+
+            .test-area:empty::before {
+                color: #888;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+        </div>
+        <div class="header-text">
+            <h1>Speech to Text</h1>
+            <p>Voice typing made easy</p>
+        </div>
+    </div>
+
+    <div class="status-card">
+        <div class="status-header">
+            <span class="status-label">Status</span>
+            <span id="statusBadge" class="status-badge ready">Ready</span>
+        </div>
+        <div class="shortcut-hint">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M20 5V4c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v1h-2V4c0-.55-.45-1-1-1h-2c-.55 0-1 .45-1 1v1H8V4c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1v1H2v15h20V5h-2zM10 19H4v-2h6v2zm0-4H4v-2h6v2zm0-4H4V9h6v2zm0-4H4V5h6v2zm8 12h-6v-2h6v2zm0-4h-6v-2h6v2zm0-4h-6V9h6v2zm0-4h-6V5h6v2z"/>
+            </svg>
+            <span>Press</span>
+            <span class="shortcut-keys">Ctrl+Shift+Y</span>
+            <span>to record</span>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>How to use</h3>
+        <div class="instruction-step">
+            <span class="step-number">1</span>
+            <span>Click on any text field or content editable area</span>
+        </div>
+        <div class="instruction-step">
+            <span class="step-number">2</span>
+            <span>Click the microphone button or use the keyboard shortcut</span>
+        </div>
+        <div class="instruction-step">
+            <span class="step-number">3</span>
+            <span>Speak clearly and your words will be transcribed</span>
+        </div>
+        <div class="instruction-step">
+            <span class="step-number">4</span>
+            <span>Press the shortcut again or click the mic to stop</span>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h3>Settings</h3>
+
+        <div class="setting-row">
+            <span class="setting-label">Language</span>
+            <select id="languageSelect">
+                <option value="en-US">English (US)</option>
+                <option value="en-GB">English (UK)</option>
+                <option value="es-ES">Spanish</option>
+                <option value="fr-FR">French</option>
+                <option value="de-DE">German</option>
+                <option value="it-IT">Italian</option>
+                <option value="pt-BR">Portuguese</option>
+                <option value="zh-CN">Chinese (Simplified)</option>
+                <option value="ja-JP">Japanese</option>
+                <option value="ko-KR">Korean</option>
+                <option value="ru-RU">Russian</option>
+                <option value="hi-IN">Hindi</option>
+                <option value="ar-SA">Arabic</option>
+            </select>
+        </div>
+
+        <div class="setting-row">
+            <span class="setting-label">Continuous mode</span>
+            <label class="toggle">
+                <input type="checkbox" id="continuousToggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="setting-row">
+            <span class="setting-label">Show notifications</span>
+            <label class="toggle">
+                <input type="checkbox" id="notificationsToggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="settings-section">
+        <h3>Test Microphone</h3>
+        <button id="testMicBtn" class="mic-test">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                <path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/>
+            </svg>
+            <span id="testBtnText">Start Test</span>
+        </button>
+        <div id="testArea" class="test-area"></div>
+    </div>
+
+    <div class="footer">
+        <a href="#" id="helpLink">Need help?</a> ·
+        <a href="#" id="feedbackLink">Send feedback</a>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>

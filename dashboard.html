@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SST Floating Control</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 10px;
+            background: rgba(18, 18, 18, 0.9);
+            color: #fff;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            user-select: none;
+            overflow: hidden;
+            width: 220px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .header {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #888;
+            padding: 0 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .btn {
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.2s;
+        }
+        .btn:hover {
+            background: #3a3a3a;
+            border-color: #555;
+            transform: translateY(-1px);
+        }
+        .btn:active {
+            transform: translateY(0px);
+            background: #444;
+        }
+        .btn-brand {
+            background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+            border: none;
+        }
+        .btn-brand:hover {
+            background: linear-gradient(135deg, #6366f1 0%, #60a5fa 100%);
+        }
+        .btn i { font-size: 16px; }
+        .status {
+            font-size: 11px;
+            padding: 5px;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            color: #4ade80;
+        }
+        .recording {
+            animation: pulse 1.5s infinite;
+            background: #ef4444 !important;
+            border-color: #f87171 !important;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">STT Control Center</div>
+    <div class="button-group">
+        <button id="btn-antigravity" class="btn">
+            <span>🚀</span> Dictate to Antigravity
+        </button>
+        <button id="btn-claude" class="btn">
+            <span>💻</span> Dictate to Claude CLI
+        </button>
+        <button id="btn-clipboard" class="btn btn-brand">
+            <span>📋</span> Dictate to Clipboard
+        </button>
+    </div>
+    <div class="status">
+        <span id="status-text">Ready</span>
+        <span id="version">v1.2</span>
+    </div>
+
+    <script>
+        const statusText = document.getElementById('status-text');
+        let isRecording = false;
+
+        async function triggerDictation(targetApp) {
+            if (isRecording) return;
+            isRecording = true;
+            statusText.innerText = 'Recording...';
+            document.querySelectorAll('.btn').forEach(b => b.classList.add('recording'));
+
+            try {
+                // Call local backend to start recording
+                const response = await fetch('http://localhost:3000/start-dictation', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ targetApp })
+                });
+                
+                const data = await response.json();
+                statusText.innerText = 'Transcribed!';
+                setTimeout(() => statusText.innerText = 'Ready', 3000);
+            } catch (err) {
+                console.error(err);
+                statusText.innerText = 'Error: ' + err.message;
+            } finally {
+                isRecording = false;
+                document.querySelectorAll('.btn').forEach(b => b.classList.remove('recording'));
+            }
+        }
+
+        document.getElementById('btn-antigravity').onclick = () => triggerDictation('Antigravity');
+        document.getElementById('btn-claude').onclick = () => triggerDictation('Terminal');
+        document.getElementById('btn-clipboard').onclick = () => triggerDictation(null);
+    </script>
+</body>
+</html>

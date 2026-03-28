@@ -1,0 +1,12 @@
+node_modules/
+logs/
+*.log
+.env
+google-credentials.json
+*.pem
+*.key
+.DS_Store
+coverage/
+.nyc_output/
+dist/
+build/

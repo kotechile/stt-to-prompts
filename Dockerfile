@@ -5,14 +5,14 @@ FROM node:18-slim
 WORKDIR /usr/src/app
 
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-COPY package*.json ./
+# We copy the package.json from the backend folder
+COPY backend/package*.json ./
 
 # Install only production dependencies
 RUN npm install --only=production
 
-# Bundle app source
-COPY . .
+# Bundle app source (Copy the entire backend folder contents into the root of the container)
+COPY backend/ .
 
 # Expose the API port (default from server.js is 3000)
 EXPOSE 3000

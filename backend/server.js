@@ -192,21 +192,14 @@ app.post('/transcribe', async (req, res) => {
         const encoding = detectAudioEncoding(audioBuffer);
         logger.debug(`[${requestId}] Detected encoding: ${encoding}`);
 
-        // Build request
+        // Build request - Simplifying config to avoid serialization errors
         const recognitionConfig = {
             encoding: encoding,
             languageCode: languageCode,
-            enableAutomaticPunctuation: enableAutomaticPunctuation,
-            enableSpokenPunctuation: enableSpokenPunctuation,
-            profanityFilter: enableProfanityFilter,
-            useEnhanced: useEnhanced,
-            model: 'latest_long',
-            metadata: {
-                interactionType: 'DISCUSSION',
-                microphoneDistance: 'NEARFIELD',
-                recordingDeviceType: 'PC',
-                originalMediaType: 'AUDIO'
-            }
+            enableAutomaticPunctuation: !!enableAutomaticPunctuation,
+            profanityFilter: !!enableProfanityFilter,
+            useEnhanced: !!useEnhanced,
+            model: useEnhanced ? 'latest_long' : 'default'
         };
 
         // Add sample rate if known

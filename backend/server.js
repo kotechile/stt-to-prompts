@@ -58,12 +58,18 @@ if (!fs.existsSync(logsDir)) {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configure CORS - restrict in production
+// Configure CORS - allow requests from the extension on any site
 const corsOptions = {
-    origin: process.env.NODE_ENV === 'production'
-        ? process.env.ALLOWED_ORIGINS?.split(',') || ['chrome-extension://*']
-        : '*',
-    methods: ['POST', 'OPTIONS'],
+    origin: (origin, callback) => {
+        // Allow requests with no origin (like mobile apps or curl) 
+        // or requests from chrome-extension or any HTTPS site (to support the content script)
+        if (!origin || origin.startsWith('chrome-extension://') || origin.startsWith('https://')) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
+    methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 };

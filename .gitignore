@@ -40,7 +40,7 @@ temp/
 *.tmp
 
 # Generated icons (keep source, ignore generated)
-extension/icons/*.png
+# extension/icons/*.png
 
 # Service account credentials
 *.json

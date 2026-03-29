@@ -1,22 +1,21 @@
 {
   "manifest_version": 3,
-  "name": "Speech to Text",
-  "version": "1.0.1",
-  "description": "Click on any input field and dictate text with your voice",
-  "permissions": ["activeTab", "storage", "scripting"],
-  "host_permissions": ["*://*/*"],
-  "background": {
-    "service_worker": "background/background.js"
-  },
-  "content_scripts": [
-    {
-      "matches": ["*://*/*"],
-      "js": ["content_scripts/speech-to-text-backend.js"],
-      "css": ["content_scripts/styles.css"],
-      "run_at": "document_end",
-      "all_frames": true
-    }
+  "name": "Speech to Text Voice Dictation",
+  "version": "1.0.3",
+  "description": "Dictate text anywhere using Google Cloud Speech-to-Text",
+  "permissions": [
+    "activeTab",
+    "storage",
+    "scripting"
   ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "background/background.js",
+    "type": "module"
+  },
   "action": {
     "default_popup": "popup/popup.html",
     "default_icon": {
@@ -32,10 +31,27 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://*/*", "http://*/*"],
+      "js": ["content_scripts/speech-to-text-backend.js"],
+      "css": ["content_scripts/styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "commands": {
+    "toggle-recording": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y",
+        "mac": "Command+Shift+Y"
+      },
+      "description": "Toggle Voice Recording"
+    }
+  },
   "web_accessible_resources": [
     {
       "resources": ["icons/*.png"],
-      "matches": ["*://*/*"]
+      "matches": ["<all_urls>"]
     }
   ]
 }

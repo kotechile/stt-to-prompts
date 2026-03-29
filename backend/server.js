@@ -24,8 +24,7 @@ const cors = require('cors');
 const speech = require('@google-cloud/speech');
 const { v4: uuidv4 } = require('uuid');
 const winston = require('winston');
-const { execSync } = require('child_process');
-const { readFileSync, writeFileSync } = require('fs');
+require('dotenv').config();
 
 // Configure logging
 const logger = winston.createLogger({
@@ -83,8 +82,21 @@ app.use((req, res, next) => {
 // Initialize Google Cloud Speech client
 let speechClient;
 try {
-    speechClient = new speech.SpeechClient();
-    logger.info('Google Cloud Speech client initialized');
+    const config = {};
+    
+    // Check if credentials are provided in an environment variable (as a JSON string)
+    if (process.env.GOOGLE_CREDENTIALS_JSON) {
+        try {
+            config.credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS_JSON);
+            logger.info('Google Cloud Speech client initialized using environment variable JSON');
+        } catch (parseError) {
+            logger.error('Failed to parse GOOGLE_CREDENTIALS_JSON environment variable:', parseError);
+        }
+    } else {
+        logger.info('Google Cloud Speech client initializing using default credentials or file path');
+    }
+    
+    speechClient = new speech.SpeechClient(config);
 } catch (error) {
     logger.error('Failed to initialize Google Cloud Speech client:', error);
     process.exit(1);
@@ -129,76 +141,6 @@ app.get('/languages', (req, res) => {
     ];
 
     res.json({ languages });
-});
-
-// NEW: Start dictation from floating dashboard
-app.post('/start-dictation', async (req, res) => {
-    const { targetApp } = req.body;
-    const audioPath = path.join(__dirname, 'temp_audio.wav');
-    
-    try {
-        logger.info(`Starting dictation for: ${targetApp || 'Clipboard'}`);
-        
-        // 1. Record audio using Mac's native afrecord
-        // We'll record for 5 seconds for now. 
-        // In a real app, you'd want a "stop" button, but for this POC, 5s is good.
-        try {
-            execSync(`afrecord -d 5 -f caff ${audioPath}`);
-        } catch (err) {
-            logger.error('Recording failed:', err);
-            return res.status(500).json({ error: 'Failed to record audio' });
-        }
-
-        // 2. Read the audio file and convert to base64
-        const audioBuffer = fs.readFileSync(audioPath);
-        const audioContent = audioBuffer.toString('base64');
-        
-        // 3. Perform transcription (internal reuse of transcribe logic)
-        // Note: For this to work, you MUST have GOOGLE_APPLICATION_CREDENTIALS set.
-        // Fallback: If no Google creds, we'll log a warning.
-        let transcript = "";
-        try {
-            const recognitionConfig = {
-                encoding: 'LINEAR16',
-                sampleRateHertz: 44100, // afrecord default for caff
-                languageCode: 'en-US',
-            };
-            const recognitionRequest = {
-                audio: { content: audioContent },
-                config: recognitionConfig
-            };
-            const [response] = await speechClient.recognize(recognitionRequest);
-            transcript = response.results
-                .map(result => result.alternatives[0].transcript)
-                .join('\n');
-        } catch (err) {
-            logger.error('Transcription failed:', err);
-            return res.status(500).json({ error: 'Transcription failed - Check Google Credentials' });
-        }
-
-        logger.info(`Transcript: ${transcript}`);
-
-        // 4. Inject text or copy to clipboard
-        if (targetApp) {
-            const pythonPath = '/opt/homebrew/bin/python3';
-            const injectorPath = path.join(__dirname, '..', 'inject_text.py');
-            execSync(`${pythonPath} "${injectorPath}" "${transcript}" "${targetApp}"`);
-        } else {
-            // Copy to clipboard using pbcopy
-            const { exec } = require('child_process');
-            const proc = exec('pbcopy');
-            proc.stdin.write(transcript);
-            proc.stdin.end();
-        }
-
-        res.json({ success: true, transcript });
-        
-    } catch (error) {
-        logger.error('Dictation process failed:', error);
-        res.status(500).json({ error: error.message });
-    } finally {
-        if (fs.existsSync(audioPath)) fs.unlinkSync(audioPath);
-    }
 });
 
 // Transcription endpoint

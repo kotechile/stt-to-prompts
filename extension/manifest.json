@@ -17,7 +17,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content_scripts/speech-to-text.js"],
+      "js": ["content_scripts/speech-to-text-backend.js"],
       "css": ["content_scripts/styles.css"],
       "run_at": "document_end",
       "all_frames": true

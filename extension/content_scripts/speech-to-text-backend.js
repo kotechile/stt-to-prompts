@@ -19,7 +19,7 @@
 
     // Configuration
     const CONFIG = {
-        backendUrl: 'http://localhost:3000',
+        backendUrl: 'https://voiceprompt.aichieve.net',
         micButtonSize: 40,
         debounceDelay: 150,
         recordingTimeSlice: 1000, // Send audio every 1 second
